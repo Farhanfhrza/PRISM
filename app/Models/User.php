@@ -17,9 +17,10 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
+        'username',
         'password',
+        'role',
+        'div_id'
     ];
 
     /**
@@ -43,5 +44,15 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function activity()
+    {
+        return $this->hasMany(Activity_log::class, 'user_id');
+    }
+    
+    public function division()
+    {
+        return $this->belongsto(Division::class);
     }
 }
