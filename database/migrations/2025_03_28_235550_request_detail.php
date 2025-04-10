@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('request_detail', function (Blueprint $table) {
+        Schema::create('request_details', function (Blueprint $table) {
             $table->id();
-            $table->integer('request_id');
-            $table->integer('stationery_id');
+            $table->foreignId('request_id');
+            $table->foreignId('stationery_id');
             $table->integer('amount');
             $table->timestamps();
         });

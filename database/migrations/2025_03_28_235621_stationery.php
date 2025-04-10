@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stationery', function (Blueprint $table) {
+        Schema::create('stationeries', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
             $table->string('category');
             $table->integer('stock');
             $table->text('description');
-            $table->string('div_id');
+            $table->foreignId('div_id');
             $table->timestamps();
         });
     }

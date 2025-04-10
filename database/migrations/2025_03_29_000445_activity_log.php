@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('activity_log', function (Blueprint $table) {
+        Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
+            $table->foreignId('user_id');
             $table->enum('activity_type', ['login', 'logout', 'create', 'update', 'add', 'delete', 'approve', 'reject'])->default('login');
             $table->enum('activity_category', ['authentication', 'request', 'stationery'])->default('authentication');
             $table->text('description');

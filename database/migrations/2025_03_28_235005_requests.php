@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('requests', function (Blueprint $table) {
             $table->id();
-            $table->integer('employee_id');
+            $table->foreignId('employee_id');
             $table->date('submit');
             $table->date('approved');
             $table->enum('status', ['pending', 'accepted', 'denied'])->default('pending'); 

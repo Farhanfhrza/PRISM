@@ -53,6 +53,6 @@ class User extends Authenticatable
     
     public function division()
     {
-        return $this->belongsto(Division::class);
+        return $this->belongsTo(Division::class);
     }
 }
