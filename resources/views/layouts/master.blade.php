@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="UTF-8">
@@ -8,15 +8,27 @@
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
     @vite('resources/css/app.css')
     <title>@yield('title')</title>
+
+    <meta name="application-name" content="{{ config('app.name') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ config('app.name') }}</title>
+
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+
+    @filamentStyles
 </head>
 
-<body>
+<body class="antialiased">
     <div class="flex flex-col w-full min-h-screen">
         @include('layouts.header')
 
         <div class="flex flex-row relative">
             @include('layouts.sidebar')
-            <main class="flex-1 pt-25 bg-white relative" id="main">
+            <main class="flex-1 pt-24 bg-white relative" id="main">
                 <div>
                     @yield('content')
                 </div>
@@ -24,6 +36,8 @@
         </div>
 
         {{-- @include('landing.layout.footer') --}}
+        @filamentScripts
+        @vite('resources/js/app.js')
     </div>
 
     <script>

@@ -40,7 +40,7 @@
                         Nama
                     </th>
                     <th scope="col" class="px-6 py-3">
-                        Kateogri
+                        Kategori
                     </th>
                     <th scope="col" class="px-6 py-3">
                         Jumlah

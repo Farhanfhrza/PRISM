@@ -13,12 +13,16 @@ return new class extends Migration
     {
         Schema::create('requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id');
-            $table->date('submit');
-            $table->date('approved');
+            $table->foreignId('employee_id')->constrained('employees');
+            $table->timestamp('submit')->useCurrent();
+            $table->timestamp('approved')->nullable();
             $table->enum('status', ['pending', 'accepted', 'denied'])->default('pending'); 
-            $table->text('information');
+            $table->text('information')->nullable();
             $table->timestamps();
+
+            // Add index for better performance  
+            $table->index('employee_id');  
+            $table->index('status'); 
         });
     }
 

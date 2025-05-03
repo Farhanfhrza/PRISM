@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content')
-    <form class="border-2 max-w-3/4 mx-auto p-4 rounded-2xl" action="{{ route('stationery.store') }}" method="POST">
+    <form class="border-2 w-3/4 mx-auto p-4 rounded-2xl" action="{{ route('stationery.store') }}" method="POST">
         @csrf
         <h1 class="text-3xl">Alat Tulis</h1>
         <label class="block mt-3">

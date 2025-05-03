@@ -15,6 +15,16 @@ class Requests extends Model
         'status',
         'information'
     ];
+    protected $attributes = [  
+        'status' => 'pending',  
+        'submit' => null  
+    ];  
+
+    protected $casts = [  
+        'submit' => 'datetime',  
+        'approved' => 'datetime',  
+        'employee_id' => 'integer'  
+    ]; 
 
     public function employee()
     {

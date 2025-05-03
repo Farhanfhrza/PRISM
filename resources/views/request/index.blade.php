@@ -26,7 +26,8 @@
     </div>
 
     <div class="max-w-7xl mx-auto mb-4 sm:px-6 lg:px-8">
-        <a href="{{ route('request.create') }}" class="bg-lime-400 text-white text-xl font-semibold py-1 px-3 rounded-3xl">Tambah Baru</a>
+        <a href="{{ route('request.create') }}"
+            class="bg-lime-400 text-white text-xl font-semibold py-1 px-3 rounded-3xl">Tambah Baru</a>
     </div>
 
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg w-3/4 m-auto">
@@ -37,13 +38,16 @@
                         ID
                     </th>
                     <th scope="col" class="px-6 py-3">
+                        Permintaan
+                    </th>
+                    <th scope="col" class="px-6 py-3">
                         Nama
                     </th>
                     <th scope="col" class="px-6 py-3">
-                        Kateogri
+                        Status
                     </th>
                     <th scope="col" class="px-6 py-3">
-                        Jumlah
+                        Waktu
                     </th>
                     <th scope="col" class="px-6 py-3">
                         Aksi
@@ -51,25 +55,45 @@
                 </tr>
             </thead>
             <tbody>
-                {{-- @foreach ($stationeries as $stationery)
+                @foreach ($requests as $request)
                     <tr class="odd:bg-white even:bg-gray-50 border-b border-gray-200">
                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                            {{ $stationery->id }}
+                            {{ $request->id }}
                         </th>
                         <td class="px-6 py-4">
-                            {{ $stationery->name }}
+                            @foreach ($request->request_detail as $detail)
+                                <li>
+                                    {{ $detail->stationery->name ?? 'N/A' }}
+                                    ({{ $detail->amount }} pcs)
+                                </li>
+                            @endforeach
                         </td>
                         <td class="px-6 py-4">
-                            {{ $stationery->category }}
+                            {{ $request->employee->name }}
                         </td>
                         <td class="px-6 py-4">
-                            {{ $stationery->stock }}
+                            @if ($request->status == 'pending')
+                                <span class="text-yellow-500">{{ $request->status }}</span>
+                            @elseif ($request->status == 'denied')
+                                <span class="text-red-500">{{ $request->status }}</span>
+                            @else
+                                <span class="text-green-500">{{ $request->status }}</span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4">
+                            @if ($request->status == 'pending')
+                                <span class="text-yellow-500">{{ $request->submit }}</span>
+                            @elseif ($request->status == 'denied')
+                                <span class="text-red-500">{{ $request->approved }}</span>
+                            @else
+                                <span class="text-green-500">{{ $request->approved }}</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4">
                             <a href="#" class="font-medium text-blue-600 hover:underline">Edit</a>
                         </td>
                     </tr>
-                @endforeach --}}
+                @endforeach
             </tbody>
         </table>
     </div>

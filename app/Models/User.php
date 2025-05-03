@@ -17,7 +17,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'username',
+        'name',
+        'email',
         'password',
         'role',
         'div_id'
@@ -50,9 +51,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Activity_log::class, 'user_id');
     }
-    
+
     public function division()
     {
         return $this->belongsTo(Division::class);
+    }
+
+    public function getFilamentName(): string
+    {
+        return $this->name;  // Or return the field you want to use as username
     }
 }

@@ -3,7 +3,7 @@
         <button type="button" id="toggle-button" class="cursor-pointer">
             <img class="w-10" src="{{ asset('images/sidebar.svg') }}" alt="">
         </button>
-        <h1 class="text-6xl text-white font-Bebas">PRISM</h1>
+        <h1 class="text-6xl text-white font-bebas">PRISM</h1>
     </div>
-    <img src="{{ asset('images/logo.png') }}" alt="" class="max-h-15">
+    <img src="{{ asset('images/logo.png') }}" alt="" class="max-h-16">
 </div>

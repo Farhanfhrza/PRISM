@@ -9,7 +9,6 @@ class Request_detail extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'name',
         'request_id',
         'stationery_id',
         'amount',

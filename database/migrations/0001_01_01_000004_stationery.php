@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('category');
             $table->integer('stock');
             $table->text('description');
-            $table->foreignId('div_id');
+            $table->foreignId('div_id')->constrained('divisions');
             $table->timestamps();
         });
     }

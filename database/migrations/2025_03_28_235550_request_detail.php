@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('request_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('request_id');
-            $table->foreignId('stationery_id');
+            $table->foreignId('request_id')->constrained('requests');
+            $table->foreignId('stationery_id')->constrained('stationeries');
             $table->integer('amount');
             $table->timestamps();
         });

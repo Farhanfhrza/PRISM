@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
+            $table->foreignId('user_id')->constrained('users');
             $table->enum('activity_type', ['login', 'logout', 'create', 'update', 'add', 'delete', 'approve', 'reject'])->default('login');
             $table->enum('activity_category', ['authentication', 'request', 'stationery'])->default('authentication');
             $table->text('description');

@@ -22,6 +22,9 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/create', [RequestController::class, 'create']) ->name('request.create');
         Route::post('/store', [RequestController::class, 'store']) ->name('request.store');
     });
+
+    Route::get('/get-name', [RequestController::class, 'getName'])->name('getName');
+    Route::get('/get-stationery', [RequestController::class, 'getStationery'])->name('getStationery');
 });
 
 Route::get('/login', [LoginController::class, 'index']) ->name('login')->middleware('guest');
