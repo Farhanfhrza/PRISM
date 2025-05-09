@@ -21,7 +21,7 @@ class Stationery extends Model
         return $this->belongsTo(Division::class);
     }
     
-    public function request_detail()
+    public function requestDetails()
     {
         return $this->hasMany(Request_detail::class, 'stationery_id');
     }

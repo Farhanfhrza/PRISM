@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('request_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('request_id')->constrained('requests');
+            $table->foreignId('request_id')->constrained('requests')->onDelete('cascade');
             $table->foreignId('stationery_id')->constrained('stationeries');
             $table->integer('amount');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -26,5 +27,6 @@ return new class extends Migration
     public function down(): void
     {
         //
+        Schema::dropIfExists('request_details');
     }
 };

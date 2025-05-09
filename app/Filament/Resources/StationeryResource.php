@@ -22,7 +22,7 @@ class StationeryResource extends Resource
 {
     protected static ?string $model = Stationery::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-paper-clip';
 
     public static function form(Form $form): Form
     {
@@ -31,12 +31,12 @@ class StationeryResource extends Resource
                 TextInput::make('name')->required(),
                 TextInput::make('category')->required(),
                 TextInput::make('stock')->numeric()->required(),
-                Textarea::make('description')->required(),
                 Select::make('div_id')
                     ->label('Divisi')
                     ->options(Division::all()->pluck('name', 'id')) // Ambil data divisi
                     ->required()
                     ->searchable(), // Agar bisa mencari divisi
+                Textarea::make('description')->required(),
             ]);
     }
 
@@ -54,7 +54,7 @@ class StationeryResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                // Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

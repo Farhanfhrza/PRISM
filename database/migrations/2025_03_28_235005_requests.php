@@ -22,7 +22,8 @@ return new class extends Migration
 
             // Add index for better performance  
             $table->index('employee_id');  
-            $table->index('status'); 
+            $table->index('status');
+            $table->softDeletes();
         });
     }
 
@@ -31,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('requests');
     }
 };
