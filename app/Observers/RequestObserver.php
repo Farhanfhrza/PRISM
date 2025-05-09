@@ -47,13 +47,7 @@ class RequestObserver
      */
     public function deleted(Requests $requests): void
     {
-        // $stationeries = Request_detail::where('request_id', $requests->id)->get()->toArray();
-
-        // foreach ($stationeries as $stationery) {
-        //     $stok = Stationery::find($stationery['stationery_id']);
-        //     $stok->stock += $stationery['amount'];
-        //     $stok->save();
-        // }
+        
     }
 
     /**
