@@ -24,6 +24,7 @@ use Filament\Tables\Columns\TextColumn;
 
 
 use function Laravel\Prompts\select;
+use Filament\Tables\Actions\Action;
 
 class RequestsResource extends Resource
 {
@@ -134,6 +135,16 @@ class RequestsResource extends Resource
                             default => 'gray',
                         };
                     }),
+            ])
+            ->emptyStateHeading('Tidak Ada Permintaan')
+            ->emptyStateDescription('')
+            ->emptyStateIcon('heroicon-o-document-arrow-up')
+            ->emptyStateActions([
+                Action::make('create')
+                    ->label('Ajukan Permintaan')
+                    ->url(route('request.create'))
+                    ->icon('heroicon-m-plus')
+                    ->button(),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
