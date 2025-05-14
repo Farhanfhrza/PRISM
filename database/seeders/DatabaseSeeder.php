@@ -20,31 +20,34 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+        
+        DB::table('divisions')->insert([
+            [
+                'name' => 'IT',
+            ],
+        ]);
 
         DB::table('users')->insert([
             [
                 'name' => 'Farhan',
                 'email' => 'refar03@gmail.com',
                 'password' => bcrypt('password'),
-                'role_id' => '1',
+                // 'role_id' => '1',
+                'div_id' => '1',
             ],
             [
                 'name' => 'Fahreza',
                 'email' => 'a@a.com',
                 'password' => bcrypt('password'),
-                'role_id' => '2',
+                // 'role_id' => '2',
+                'div_id' => '1',
             ],
             [
                 'name' => 'Ramadhan',
                 'email' => 'b@b.com',
                 'password' => bcrypt('password'),
                 // 'role_id' => '2',
-            ],
-        ]);
-        
-        DB::table('divisions')->insert([
-            [
-                'name' => 'IT',
+                'div_id' => '1',
             ],
         ]);
         

@@ -127,12 +127,21 @@ class RequestsResource extends Resource
                 TextColumn::make('employee.name')->label('Nama'),
                 TextColumn::make('status')
                     ->label('Status')
+                    ->badge()
                     ->color(function ($state) {
                         return match ($state) {
-                            'approved' => 'success',
+                            'accepted' => 'success',
                             'pending' => 'warning',
                             'rejected' => 'danger',
                             default => 'gray',
+                        };
+                    })
+                    ->icon(function ($state) {
+                        return match ($state) {
+                            'accepted' => 'heroicon-m-check-circle',
+                            'pending' => 'heroicon-m-clock',
+                            'rejected' => 'heroicon-m-check-badge',
+                            default => 'heroicon-m-exclamation-circle',
                         };
                     }),
             ])
@@ -150,10 +159,17 @@ class RequestsResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->hidden(fn (Requests $record): bool => !is_null($record->deleted_at)),
+                Tables\Actions\EditAction::make()
+                ->hidden(fn (Requests $record): bool => 
+                        !is_null($record->deleted_at) || $record->status !== 'pending'
+                    ),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
+                Action::make('detail')
+                    ->url(fn($record) => static::getUrl('detail', ['record' => $record]))
+                    ->authorize('detail', Requests::class)
+                    ,
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -177,6 +193,7 @@ class RequestsResource extends Resource
             'index' => Pages\ListRequests::route('/'),
             'create' => Pages\CreateRequests::route('/create'),
             'edit' => Pages\EditRequests::route('/{record}/edit'),
+            'detail' => Pages\RequestDetail::route('/{record}/detail'),
         ];
     }
 

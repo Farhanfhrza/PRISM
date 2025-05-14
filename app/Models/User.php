@@ -21,7 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'role_id',
         'div_id'
     ];
 
@@ -55,11 +55,16 @@ class User extends Authenticatable
 
     public function division()
     {
-        return $this->belongsTo(Division::class);
+        return $this->belongsTo(Division::class, 'div_id');
     }
 
     public function getFilamentName(): string
     {
         return $this->name;  // Or return the field you want to use as username
+    }
+
+    public function getRoleName(): string
+    {
+        return $this->roles->first()?->name ?? 'No Role';
     }
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('employee_id')->constrained('employees');
             $table->timestamp('submit')->useCurrent();
             $table->timestamp('approved')->nullable();
-            $table->enum('status', ['pending', 'accepted', 'denied'])->default('pending'); 
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending'); 
             $table->text('information')->nullable();
             $table->timestamps();
 

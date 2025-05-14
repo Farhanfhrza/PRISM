@@ -16,8 +16,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('email')->unique();
             $table->string('password');
-            // $table->string('role');
-            // $table->foreignId('div_id')->constrained('divisions');
+            $table->foreignId('div_id')->constrained('divisions');
             $table->rememberToken();
             $table->timestamps();
         });

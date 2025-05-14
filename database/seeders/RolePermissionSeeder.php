@@ -11,26 +11,26 @@ class RolePermissionSeeder extends Seeder
 {
     public function run()
     {
-        // Membuat permissions
-        $permissions = [
-            'create-post',
-            'edit-post',
-            'delete-post',
-            'view-post',
-        ];
+        // // Membuat permissions
+        // $permissions = [
+        //     'create-post',
+        //     'edit-post',
+        //     'delete-post',
+        //     'view-post',
+        // ];
 
-        foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
-        }
+        // foreach ($permissions as $permission) {
+        //     Permission::create(['name' => $permission]);
+        // }
 
         // Membuat roles
         $adminRole = Role::create(['name' => 'admin']);
         $userRole = Role::create(['name' => 'user']);
 
         // Memberikan permissions ke role admin
-        $adminRole->givePermissionTo($permissions);
+        // $adminRole->givePermissionTo($permissions);
 
-        // Memberikan permissions ke role user
-        $userRole->givePermissionTo(['view-post']);
+        // // Memberikan permissions ke role user
+        // $userRole->givePermissionTo(['view-post']);
     }
 }

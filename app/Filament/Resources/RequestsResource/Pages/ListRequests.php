@@ -5,6 +5,9 @@ namespace App\Filament\Resources\RequestsResource\Pages;
 use App\Filament\Resources\RequestsResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\RequestsResource\Pages\RequestDetail;
+use App\Models\Requests;
+
 
 class ListRequests extends ListRecords
 {
@@ -14,6 +17,19 @@ class ListRequests extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+        ];
+    }
+
+    protected function getTableActions(): array
+    {
+        return [
+            // Tombol Edit
+            Actions\EditAction::make(),
+
+            // Tombol View Detail
+            Actions\Action::make('detail')
+                ->label('View Detail')
+                ->url(fn (Requests $record): string => RequestDetail::getUrl(['record' => $record])),
         ];
     }
 }
