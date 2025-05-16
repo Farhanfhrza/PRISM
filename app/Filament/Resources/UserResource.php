@@ -48,6 +48,13 @@ class UserResource extends Resource
 
     public static function table(Table $table): Table
     {
+        $exportColumns = [
+            'id' => 'ID',
+            'name' => 'Name',
+            'email' => 'Email',
+            'created_at' => 'Created At',
+        ];
+
         return $table
             ->columns([
                 TextColumn::make('name')->label('Nama'),

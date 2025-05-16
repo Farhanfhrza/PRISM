@@ -81,6 +81,7 @@ class RequestDetail extends ViewRecord
 
                     // Update status menjadi accepted
                     $record->status = 'accepted';
+                    $record->approved = now();
                     $record->save();
 
                     // Notifikasi berhasil
@@ -103,6 +104,7 @@ class RequestDetail extends ViewRecord
 
                     // Update status menjadi rejected
                     $record->status = 'rejected';
+                    $record->approved = now();
                     $record->save();
 
                     // Notifikasi berhasil

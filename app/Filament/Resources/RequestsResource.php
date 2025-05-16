@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\RequestsExporter;
 use App\Filament\Resources\RequestsResource\Pages;
 use App\Filament\Resources\RequestsResource\RelationManagers;
 use App\Models\Requests;
@@ -21,6 +22,8 @@ use Filament\Forms\Components\TextArea;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Hidden;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
 
 
 use function Laravel\Prompts\select;
@@ -85,20 +88,20 @@ class RequestsResource extends Resource
                                     return function (string $attribute, $value, $fail) use ($get) {
                                         $stationeryId = $get('stationery_id');
                                         $stationery = Stationery::find($stationeryId);
-    
+
                                         if ($stationery) {
                                             // Hitung stok tersedia (stok saat ini + stok yang sedang di-request)
                                             $currentRequestId = $get('../../id');
                                             $requestedAmount = 0;
-    
+
                                             if ($currentRequestId) {
                                                 $requestedAmount = Request_detail::where('request_id', $currentRequestId)
                                                     ->where('stationery_id', $stationeryId)
                                                     ->sum('amount');
                                             }
-    
+
                                             $availableStock = $stationery->stock + $requestedAmount;
-    
+
                                             if ($value > $availableStock) {
                                                 $fail("Jumlah melebihi stok tersedia (Stok: {$availableStock})");
                                             }
@@ -145,6 +148,10 @@ class RequestsResource extends Resource
                         };
                     }),
             ])
+            ->headerActions([
+                Tables\Actions\ExportAction::make()
+                    ->exporter(RequestsExporter::class)
+            ])
             ->emptyStateHeading('Tidak Ada Permintaan')
             ->emptyStateDescription('')
             ->emptyStateIcon('heroicon-o-document-arrow-up')
@@ -157,10 +164,27 @@ class RequestsResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Filter::make('submit')
+                    ->form([
+                        DatePicker::make('from')->label('Dari Tanggal'),
+                        DatePicker::make('to')->label('Sampai Tanggal')
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date)
+                            )
+                            ->when(
+                                $data['to'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date)
+                            );
+                    })
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->hidden(fn (Requests $record): bool => 
+                    ->hidden(
+                        fn(Requests $record): bool =>
                         !is_null($record->deleted_at) || $record->status !== 'pending'
                     ),
                 Tables\Actions\DeleteAction::make(),
@@ -168,8 +192,7 @@ class RequestsResource extends Resource
                 Tables\Actions\RestoreAction::make(),
                 Action::make('detail')
                     ->url(fn($record) => static::getUrl('detail', ['record' => $record]))
-                    ->authorize('detail', Requests::class)
-                    ,
+                    ->authorize('detail', Requests::class),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
