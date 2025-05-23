@@ -13,12 +13,16 @@ return new class extends Migration
     {
         Schema::create('stationeries', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
+            $table->string('name');
             $table->string('category');
-            $table->integer('stock');
+            $table->integer('stock')->default(0);
+            $table->string('unit');
+            $table->integer('initial_stock')->default(0);
             $table->text('description');
             $table->foreignId('div_id')->constrained('divisions');
             $table->timestamps();
+
+            $table->unique(['name', 'div_id']);
         });
     }
 

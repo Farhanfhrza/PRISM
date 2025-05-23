@@ -25,6 +25,9 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'IT',
             ],
+            [
+                'name' => 'HUMAS',
+            ],
         ]);
 
         DB::table('users')->insert([
@@ -32,22 +35,19 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Farhan',
                 'email' => 'refar03@gmail.com',
                 'password' => bcrypt('password'),
-                // 'role_id' => '1',
                 'div_id' => '1',
             ],
             [
                 'name' => 'Fahreza',
                 'email' => 'a@a.com',
                 'password' => bcrypt('password'),
-                // 'role_id' => '2',
                 'div_id' => '1',
             ],
             [
                 'name' => 'Ramadhan',
                 'email' => 'b@b.com',
                 'password' => bcrypt('password'),
-                // 'role_id' => '2',
-                'div_id' => '1',
+                'div_id' => '2',
             ],
         ]);
         
@@ -63,16 +63,29 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Mouse',
                 'category' => 'Electronic',
+                'initial_stock' => '100',
                 'stock' => '100',
+                'unit' => 'piece',
                 'description' => 'Desc',
                 'div_id' => '1',
             ],
             [
                 'name' => 'Cable',
                 'category' => 'Electronic',
+                'initial_stock' => '200',
                 'stock' => '200',
+                'unit' => 'piece',
                 'description' => 'Desc',
                 'div_id' => '1',
+            ],
+            [
+                'name' => 'Pulpen Joyko',
+                'category' => 'Stationery',
+                'initial_stock' => '50',
+                'stock' => '50',
+                'unit' => 'pack',
+                'description' => 'Desc',
+                'div_id' => '2',
             ],
         ]);
 

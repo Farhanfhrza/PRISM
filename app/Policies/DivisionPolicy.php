@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\Requests;
+use App\Models\Division;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class RequestsPolicy
+class DivisionPolicy
 {
     use HandlesAuthorization;
 
@@ -15,15 +15,15 @@ class RequestsPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_requests');
+        return $user->can('view_any_division');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Requests $requests): bool
+    public function view(User $user, Division $division): bool
     {
-        return $user->can('view_requests');
+        return $user->can('view_division');
     }
 
     /**
@@ -31,23 +31,23 @@ class RequestsPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_requests');
+        return $user->can('create_division');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Requests $requests): bool
+    public function update(User $user, Division $division): bool
     {
-        return $user->can('update_requests');
+        return $user->can('update_division');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Requests $requests): bool
+    public function delete(User $user, Division $division): bool
     {
-        return $user->can('delete_requests');
+        return $user->can('delete_division');
     }
 
     /**
@@ -55,15 +55,15 @@ class RequestsPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_requests');
+        return $user->can('delete_any_division');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, Requests $requests): bool
+    public function forceDelete(User $user, Division $division): bool
     {
-        return $user->can('force_delete_requests');
+        return $user->can('force_delete_division');
     }
 
     /**
@@ -71,15 +71,15 @@ class RequestsPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_requests');
+        return $user->can('force_delete_any_division');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, Requests $requests): bool
+    public function restore(User $user, Division $division): bool
     {
-        return $user->can('restore_requests');
+        return $user->can('restore_division');
     }
 
     /**
@@ -87,15 +87,15 @@ class RequestsPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_requests');
+        return $user->can('restore_any_division');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, Requests $requests): bool
+    public function replicate(User $user, Division $division): bool
     {
-        return $user->can('replicate_requests');
+        return $user->can('replicate_division');
     }
 
     /**
@@ -103,6 +103,6 @@ class RequestsPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_requests');
+        return $user->can('reorder_division');
     }
 }

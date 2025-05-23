@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\RequestDetailResource\Pages;
-use App\Filament\Resources\RequestDetailResource\RelationManagers;
-use App\Models\Request_detail;
+use App\Filament\Resources\TransactionResource\Pages;
+use App\Filament\Resources\TransactionResource\RelationManagers;
+use App\Models\Transaction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,17 +13,15 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class RequestDetailResource extends Resource
+class TransactionResource extends Resource
 {
-    protected static ?string $model = Request_detail::class;
+    protected static ?string $model = Transaction::class;
 
-    protected static ?string $navigationGroup = 'Stationery';
+    protected static ?string $navigationGroup = 'Stock';
 
-    protected static ?int $navigationSort = 3;
-    
-    protected static ?string $navigationLabel = 'Request Details';
-    
-    protected static ?string $navigationIcon = 'heroicon-o-document-magnifying-glass';
+    protected static ?int $navigationSort = 6;
+
+    protected static ?string $navigationIcon = 'heroicon-o-arrows-up-down';
 
     public static function form(Form $form): Form
     {
@@ -62,9 +60,9 @@ class RequestDetailResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRequestDetails::route('/'),
-            'create' => Pages\CreateRequestDetail::route('/create'),
-            'edit' => Pages\EditRequestDetail::route('/{record}/edit'),
+            'index' => Pages\ListTransactions::route('/'),
+            'create' => Pages\CreateTransaction::route('/create'),
+            'edit' => Pages\EditTransaction::route('/{record}/edit'),
         ];
     }
 }

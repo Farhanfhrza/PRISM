@@ -2,28 +2,27 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\RequestDetailResource\Pages;
-use App\Filament\Resources\RequestDetailResource\RelationManagers;
-use App\Models\Request_detail;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Employee;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\EmployeeResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\EmployeeResource\RelationManagers;
 
-class RequestDetailResource extends Resource
+class EmployeeResource extends Resource
 {
-    protected static ?string $model = Request_detail::class;
+    protected static ?string $model = Employee::class;
 
-    protected static ?string $navigationGroup = 'Stationery';
+    protected static ?int $navigationSort = 7;
 
-    protected static ?int $navigationSort = 3;
-    
-    protected static ?string $navigationLabel = 'Request Details';
-    
-    protected static ?string $navigationIcon = 'heroicon-o-document-magnifying-glass';
+    protected static ?string $navigationGroup = 'Users';
+
+    protected static ?string $navigationIcon = 'heroicon-o-user';
 
     public static function form(Form $form): Form
     {
@@ -37,7 +36,10 @@ class RequestDetailResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('id')->label('ID'),
+                TextColumn::make('name')->label('Nama'),
+                TextColumn::make('department')->label('Departemen'),
+                TextColumn::make('division.name')->label('Divisi'),
             ])
             ->filters([
                 //
@@ -62,9 +64,9 @@ class RequestDetailResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRequestDetails::route('/'),
-            'create' => Pages\CreateRequestDetail::route('/create'),
-            'edit' => Pages\EditRequestDetail::route('/{record}/edit'),
+            'index' => Pages\ListEmployees::route('/'),
+            'create' => Pages\CreateEmployee::route('/create'),
+            'edit' => Pages\EditEmployee::route('/{record}/edit'),
         ];
     }
 }

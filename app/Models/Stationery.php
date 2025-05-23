@@ -20,9 +20,17 @@ class Stationery extends Model
     {
         return $this->belongsTo(Division::class);
     }
-    
+
     public function requestDetails()
     {
         return $this->hasMany(Request_detail::class, 'stationery_id');
+    }
+
+    // Dalam model Product (atau model terkait)
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            $model->initial_stock = $model->stock;
+        });
     }
 }

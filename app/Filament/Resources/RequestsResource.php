@@ -2,36 +2,42 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Exports\RequestsExporter;
-use App\Filament\Resources\RequestsResource\Pages;
-use App\Filament\Resources\RequestsResource\RelationManagers;
-use App\Models\Requests;
-use App\Models\Employee;
-use App\Models\Stationery;
-use App\Models\Request_detail;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Employee;
+use App\Models\Requests;
+use Filament\Forms\Form;
+use App\Models\Stationery;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextArea;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Hidden;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\DatePicker;
-
-
-use function Laravel\Prompts\select;
+use App\Models\Request_detail;
+use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
+use function Laravel\Prompts\select;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextArea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Exports\RequestsExporter;
+use Filament\Forms\Components\DateTimePicker;
+
+
+use App\Filament\Resources\RequestsResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\RequestsResource\RelationManagers;
 
 class RequestsResource extends Resource
 {
     protected static ?string $model = Requests::class;
+
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $navigationGroup = 'Stationery';
 
     protected static ?string $navigationIcon = 'heroicon-o-document-arrow-up';
 
@@ -41,18 +47,19 @@ class RequestsResource extends Resource
             ->schema([
                 Select::make('employee_id')
                     ->label('Karyawan')
-                    ->options(Employee::all()->pluck('name', 'id')) // Ambil data divisi
+                    ->options(Employee::where('div_id', Auth::user()->div_id)->pluck('name', 'id')) // Ambil data divisi
                     ->required()
                     ->searchable(),
                 Textarea::make('information')
                     ->required()
                     ->label('Informasi'),
+                DateTimePicker::make('submit')->label('Waktu Pengajuan'),
                 Repeater::make('requestDetails')
                     ->relationship()
                     ->schema([
                         Select::make('stationery_id')
                             ->label('Alat Tulis')
-                            ->options(Stationery::all()->pluck('name', 'id')) // Ambil data divisi
+                            ->options(Stationery::where('div_id', Auth::user()->div_id)->pluck('name', 'id')) // Ambil data divisi
                             ->required()
                             ->searchable()
                             ->reactive()
@@ -111,7 +118,6 @@ class RequestsResource extends Resource
                             ]),
                         TextInput::make('stock')->label('Stok Tersedia')->disabled(),
                     ]),
-                Hidden::make('submit')->default(now())
             ]);
     }
 

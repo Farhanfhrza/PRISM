@@ -2,28 +2,27 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\RequestDetailResource\Pages;
-use App\Filament\Resources\RequestDetailResource\RelationManagers;
-use App\Models\Request_detail;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Division;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\DivisionResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\DivisionResource\RelationManagers;
 
-class RequestDetailResource extends Resource
+class DivisionResource extends Resource
 {
-    protected static ?string $model = Request_detail::class;
+    protected static ?string $model = Division::class;
 
-    protected static ?string $navigationGroup = 'Stationery';
+    protected static ?int $navigationSort = 8;
 
-    protected static ?int $navigationSort = 3;
-    
-    protected static ?string $navigationLabel = 'Request Details';
-    
-    protected static ?string $navigationIcon = 'heroicon-o-document-magnifying-glass';
+    protected static ?string $navigationGroup = 'Users';
+
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     public static function form(Form $form): Form
     {
@@ -37,7 +36,8 @@ class RequestDetailResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('id')->label('ID'),
+                TextColumn::make('name')->label('Divisi'),
             ])
             ->filters([
                 //
@@ -62,9 +62,9 @@ class RequestDetailResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRequestDetails::route('/'),
-            'create' => Pages\CreateRequestDetail::route('/create'),
-            'edit' => Pages\EditRequestDetail::route('/{record}/edit'),
+            'index' => Pages\ListDivisions::route('/'),
+            'create' => Pages\CreateDivision::route('/create'),
+            'edit' => Pages\EditDivision::route('/{record}/edit'),
         ];
     }
 }
