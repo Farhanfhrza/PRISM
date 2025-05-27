@@ -53,7 +53,9 @@ class RequestsResource extends Resource
                 Textarea::make('information')
                     ->required()
                     ->label('Informasi'),
-                DateTimePicker::make('submit')->label('Waktu Pengajuan'),
+                DateTimePicker::make('submit')
+                    ->label('Waktu Pengajuan')
+                    ->required(),
                 Repeater::make('requestDetails')
                     ->relationship()
                     ->schema([
@@ -133,7 +135,9 @@ class RequestsResource extends Resource
                             'details' => $record->requestDetails,
                         ]);
                     }),
-                TextColumn::make('employee.name')->label('Nama'),
+                TextColumn::make('employee.name')
+                    ->searchable()
+                    ->label('Nama'),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
@@ -153,6 +157,11 @@ class RequestsResource extends Resource
                             default => 'heroicon-m-exclamation-circle',
                         };
                     }),
+                TextColumn::make('submit')
+                ->date()
+                ->sortable()
+                ->searchable()
+                ->toggleable(),
             ])
             ->headerActions([
                 Tables\Actions\ExportAction::make()
@@ -170,6 +179,21 @@ class RequestsResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Filter::make('Accepted')->query(
+                    function (Builder $query): Builder {
+                        return $query->where('status','accepted');
+                    }
+                ),
+                Filter::make('Pending')->query(
+                    function (Builder $query): Builder {
+                        return $query->where('status','pending');
+                    }
+                ),
+                Filter::make('Rejected')->query(
+                    function (Builder $query): Builder {
+                        return $query->where('status','rejected');
+                    }
+                ),
                 Filter::make('submit')
                     ->form([
                         DatePicker::make('from')->label('Dari Tanggal'),
@@ -231,6 +255,9 @@ class RequestsResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])
+            ->whereHas('employee', function (Builder $query) {
+                $query->where('div_id', Auth::user()->div_id);
+            });
     }
 }

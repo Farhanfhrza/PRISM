@@ -14,6 +14,7 @@ use Filament\Resources\Pages\ViewRecord;
 use App\Filament\Resources\RequestsResource;
 use App\Models\Employee;
 use App\Models\Stationery;
+use App\Models\Request_detail;
 use Filament\Forms\Components\DateTimePicker;
 
 class RequestDetail extends ViewRecord
@@ -101,6 +102,14 @@ class RequestDetail extends ViewRecord
                 ->icon('heroicon-o-x-circle')
                 ->action(function () {
                     $record = $this->record;
+
+                    $stationeries = Request_detail::where('request_id', $this->record->id)->get()->toArray();
+
+                    foreach ($stationeries as $stationery) {
+                        $stok = Stationery::find($stationery['stationery_id']);
+                        $stok->stock += $stationery['amount']; // Kurangi stok
+                        $stok->save();
+                    }
 
                     // Update status menjadi rejected
                     $record->status = 'rejected';

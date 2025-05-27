@@ -8,6 +8,7 @@ use App\Models\Employee;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\EmployeeResource\Pages;
@@ -37,10 +38,19 @@ class EmployeeResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id')->label('ID'),
-                TextColumn::make('name')->label('Nama'),
-                TextColumn::make('department')->label('Departemen'),
-                TextColumn::make('division.name')->label('Divisi'),
+                TextColumn::make('name')
+                ->searchable()
+                ->label('Nama'),
+                TextColumn::make('department')
+                ->searchable()
+                ->label('Departemen'),
+                TextColumn::make('division.name')
+                ->searchable()
+                ->label('Divisi'),
             ])
+            ->query(
+                Employee::query()->where('div_id', Auth::user()->div_id)
+            )
             ->filters([
                 //
             ])

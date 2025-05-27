@@ -12,6 +12,8 @@ class Stationery extends Model
         'name',
         'category',
         'stock',
+        'initial_stock',
+        'unit',
         'description',
         'div_id'
     ];
@@ -32,5 +34,23 @@ class Stationery extends Model
         static::creating(function ($model) {
             $model->initial_stock = $model->stock;
         });
+    }
+
+    public function getGlobalSearchResultTitle(): string
+    {
+        return "{$this->name} - {$this->category}";
+    }
+
+    public function getGlobalSearchResultDetails(): array
+    {
+        return [
+            'Kategori' => $this->category,
+            'Stok' => $this->stock,
+        ];
+    }
+
+    public function getGlobalSearchResultUrl(): string
+    {
+        return \App\Filament\Resources\StationeryResource::getUrl('edit', ['record' => $this]);
     }
 }

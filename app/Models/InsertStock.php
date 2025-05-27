@@ -21,4 +21,5 @@ class InsertStock extends Model
     {
         return $this->belongsTo(User::class, 'inserted_by');
     }
+    
 }

@@ -7,6 +7,7 @@ use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\RequestsResource\Pages\RequestDetail;
 use App\Models\Requests;
+use Illuminate\Support\Facades\Auth;
 
 
 class ListRequests extends ListRecords
@@ -31,5 +32,13 @@ class ListRequests extends ListRecords
                 ->label('View Detail')
                 ->url(fn (Requests $record): string => RequestDetail::getUrl(['record' => $record])),
         ];
+    }
+
+    protected static ?string $title = null;
+
+    public function getTitle(): string
+    {
+        $divisionName = Auth::user()?->division?->name ?? 'Divisi Tidak Diketahui';
+        return "Requests Divisi {$divisionName}";
     }
 }

@@ -2,16 +2,23 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Forms;
+use Filament\Tables;
+use Filament\Forms\Form;
+use App\Models\Stationery;
+use Filament\Tables\Table;
+use App\Models\InsertStock;
+use Filament\Facades\Filament;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\DateTimePicker;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\InsertStockResource\Pages;
 use App\Filament\Resources\InsertStockResource\RelationManagers;
-use App\Models\InsertStock;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class InsertStockResource extends Resource
 {
@@ -27,7 +34,18 @@ class InsertStockResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Select::make('stationery_id')
+                    ->label('Stationery')
+                    ->options(fn() => Stationery::where('div_id', Auth::user()->div_id)->pluck('name', 'id')) // Ambil data divisi
+                    ->required()
+                    ->searchable(),
+                TextInput::make('amount')
+                    ->numeric()
+                    ->required()
+                    ->minValue(1),
+                DateTimePicker::make('inserted_at')
+                    ->label('Waktu Input')
+                    ->required(),
             ]);
     }
 
@@ -35,13 +53,23 @@ class InsertStockResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('id')->label('ID'),
+                TextColumn::make('stationery.name')->label('Stationery'),
+                TextColumn::make('amount')->label('Jumlah'),
+                TextColumn::make('inserted_at')
+                ->label('Waktu Input')
+                ->date()
+                ->sortable()
+                ->searchable(),
+                TextColumn::make('insertedBy.name')
+                ->label('Diinput Oleh'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

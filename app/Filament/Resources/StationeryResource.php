@@ -2,21 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\StationeryResource\Pages;
-use App\Filament\Resources\StationeryResource\RelationManagers;
-use App\Models\Stationery;
-use App\Models\Division;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Division;
+use Filament\Forms\Form;
+use App\Models\Stationery;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextArea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\TextArea;
-use Filament\Forms\Components\Select;
-use Filament\Tables\Columns\TextColumn;
+use App\Filament\Resources\StationeryResource\Pages;
+use App\Filament\Resources\StationeryResource\RelationManagers;
 
 class StationeryResource extends Resource
 {
@@ -28,19 +29,32 @@ class StationeryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-paper-clip';
 
+    protected static bool $globallySearchable = true;
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'category'];
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 TextInput::make('name')->required(),
                 TextInput::make('category')->required(),
-                TextInput::make('stock')->numeric()->required(),
-                TextInput::make('unit')->required(),
+                TextInput::make('stock')
+                    ->numeric()
+                    ->required()
+                    ->disabledOn('edit'),
+                TextInput::make('unit')
+                    ->required()
+                    ->disabledOn('edit'),
                 Select::make('div_id')
                     ->label('Divisi')
                     ->options(Division::all()->pluck('name', 'id')) // Ambil data divisi
                     ->required()
-                    ->searchable(), // Agar bisa mencari divisi
+                    ->searchable()
+                    ->disabledOn('edit'),
                 Textarea::make('description')->required(),
             ]);
     }
@@ -57,11 +71,20 @@ class StationeryResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->label('ID'),
-                TextColumn::make('name')->label('Nama'),
-                TextColumn::make('category')->label('Kategori'),
+                TextColumn::make('id')
+                ->label('ID'),
+                TextColumn::make('name')
+                ->searchable()
+                ->label('Nama'),
+                TextColumn::make('category')
+                ->searchable()
+                ->label('Kategori'),
                 TextColumn::make('stock')->numeric()->label('Stok'),
+                TextColumn::make('unit')->numeric()->label('Satuan'),
             ])
+            ->query(
+                Stationery::query()->where('div_id', Auth::user()->div_id)
+            )
             ->filters([
                 //
             ])
