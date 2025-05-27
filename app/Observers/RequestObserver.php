@@ -3,8 +3,10 @@
 namespace App\Observers;
 
 use App\Models\Requests;
-use App\Models\Request_detail;
 use App\Models\Stationery;
+use App\Models\Transaction;
+use App\Models\Request_detail;
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\DB;
 
 class RequestObserver
@@ -12,10 +14,7 @@ class RequestObserver
     /**
      * Handle the Requests "created" event.
      */
-    public function created(Requests $requests): void
-    {
-        //
-    }
+    public function created(Requests $requests): void {}
 
     /**
      * Handle the Requests "updated" event.
@@ -45,23 +44,40 @@ class RequestObserver
     /**
      * Handle the Requests "deleted" event.
      */
-    public function deleted(Requests $requests): void
-    {
-        
-    }
+    public function deleted(Requests $requests): void {}
 
     /**
      * Handle the Requests "restored" event.
      */
     public function restored(Requests $requests): void
     {
-        $stationeries = Request_detail::where('request_id', $requests->id)->get()->toArray();
+        // $user = Filament::auth()->user();
+        // $stationeries = Request_detail::where('request_id', $requests->id)->get()->toArray();
 
-        foreach ($stationeries as $stationery) {
-            $stok = Stationery::find($stationery['stationery_id']);
-            $stok->stock -= $stationery['amount']; // Kurangi stok
-            $stok->save();
-        }
+        // foreach ($stationeries as $stationery) {
+        //     $stok = Stationery::find($stationery['stationery_id']);
+        //     $stok->stock -= $stationery['amount']; // Kurangi stok
+        //     $stok->save();
+
+        //     Transaction::create([
+        //         'user_id' => $user?->id,
+        //         'stationery_id' => $stationery['stationery_id'],
+        //         'transaction_type' => 'Out',
+        //         'amount' => $stationery['amount'],
+        //         'description' => "Pengguna {$user->name} mengembalikan data request, mengurangi stok {$stok->name} sebanyak {$stationery['amount']} {$stok->unit}",
+        //         'source_type' => 'Insert Stationery Stock',
+        //         'source_id' => $requests->id,
+        //         'created_at' => now(),
+        //     ]);
+        // }
+    }
+
+    public function deleting(Requests $requests): void
+    {
+        // Simpan data sebelum dihapus ke properti
+        $requests->details_before_force_delete = Request_detail::withTrashed()
+            ->where('request_id', $requests->id)
+            ->get();
     }
 
     /**
@@ -70,14 +86,21 @@ class RequestObserver
     public function forceDeleted(Requests $requests): void
     {
         // Ambil semua request_detail (termasuk yang sudah di-softDelete)
-        $stationeries = Request_detail::withTrashed()->where('request_id', $requests->id)->get();
+        $user = Filament::auth()->user();
+        $stationeries = $requests->details_before_force_delete ?? collect();
 
         foreach ($stationeries as $stationery) {
             $stok = Stationery::find($stationery->stationery_id);
-            if ($stok) {
-                $stok->stock += $stationery->amount;
-                $stok->save();
-            }
+            Transaction::create([
+                'user_id' => $user->id,
+                'stationery_id' => $stok->id,
+                'transaction_type' => 'In',
+                'amount' => $stationery->amount,
+                'description' => "Pengguna {$user->name} menghapus data request, sehingga stok {$stok->name} bertambah sebanyak {$stationery->amount} {$stok->unit}",
+                'source_type' => 'Request',
+                'source_id' => $requests->id,
+                'created_at' => now(),
+            ]);
         }
     }
 }

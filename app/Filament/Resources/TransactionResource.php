@@ -41,14 +41,17 @@ class TransactionResource extends Resource
                     ->label('Pengguna')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('stationery.name')
-                    ->label('Alat Tulis')
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('transaction_type')
                     ->label('Jenis Transaksi')
                     ->badge()
                     ->color(fn($state) => $state === 'In' ? 'success' : 'danger')
+                    ->sortable(),
+                TextColumn::make('stationery.name')
+                    ->label('Alat Tulis')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('amount')->numeric()
+                    ->label('Jumlah')
                     ->sortable(),
                 TextColumn::make('description')
                     ->label('Deskripsi')

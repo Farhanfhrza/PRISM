@@ -47,6 +47,20 @@ class InsertStockObserver
     {
         Stationery::where('id', $insertStock->stationery_id)
             ->decrement('stock', $insertStock->amount);
+
+        $user = Filament::auth()->user();
+        $stationery = Stationery::find($insertStock->stationery_id);
+
+        Transaction::create([
+            'user_id' => $user?->id,
+            'stationery_id' => $insertStock->stationery_id,
+            'transaction_type' => 'Out',
+            'amount' => $insertStock->amount,
+            'description' => "Pengguna {$user->name} menghapus data tambah stok {$stationery->name} sebanyak {$insertStock->amount} {$stationery->unit}",
+            'source_type' => 'Insert Stationery Stock',
+            'source_id' => $insertStock->id,
+            'created_at' => now(),
+        ]);
     }
 
     /**
