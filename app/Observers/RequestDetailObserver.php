@@ -3,8 +3,10 @@
 namespace App\Observers;
 
 use App\Models\Requests;
-use App\Models\Request_detail;
 use App\Models\Stationery;
+use App\Models\Transaction;
+use App\Models\Request_detail;
+use Filament\Facades\Filament;
 
 class RequestDetailObserver
 {
@@ -21,10 +23,26 @@ class RequestDetailObserver
      */
     public function updated(Request_detail $request_detail): void
     {
+        $user = Filament::auth()->user();
+
         $oldAmount = $request_detail->getOriginal('amount');
         $newAmount = $request_detail->amount;
+        $diff = ($oldAmount>$newAmount ? "In" : "Out");
+        $diffAmount = abs($oldAmount-$newAmount);
 
         $stationery = Stationery::find($request_detail->stationery_id);
+
+        Transaction::create([
+            'user_id' => $user->id,
+            'stationery_id' => $stationery->id,
+            'transaction_type' => $diff,
+            'div_id' => $user?->div_id,
+            'amount' => $diffAmount,
+            'description' => "Pengguna {$user->name} mengubah jumlah request stationery {$stationery->name} dari {$oldAmount} menjadi {$newAmount}",
+            'source_type' => 'Request',
+            'source_id' => $request_detail->request_id,
+            'created_at' => now(),
+        ]);
 
         // Kembalikan stok lama, lalu kurangi stok baru
         $stationery->stock += $oldAmount;

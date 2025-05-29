@@ -14,6 +14,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextArea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\StationeryResource\Pages;
@@ -86,7 +87,14 @@ class StationeryResource extends Resource
                 Stationery::query()->where('div_id', Auth::user()->div_id)
             )
             ->filters([
-                //
+                SelectFilter::make('category')
+                ->label('Kategori')
+                ->multiple()
+                ->options([
+                    'Stationery' => 'Stationery',
+                    'Electronic' => 'Electronic',
+                    'Utility' => 'Utility',
+                ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

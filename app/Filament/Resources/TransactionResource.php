@@ -9,6 +9,7 @@ use Filament\Tables\Table;
 use App\Models\Transaction;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\TransactionResource\Pages;
@@ -63,7 +64,12 @@ class TransactionResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                //
+                SelectFilter::make('transaction_type')
+                ->label('Jenis Transaksi')
+                ->options([
+                    'In' => 'In',
+                    'Out' => 'Out',
+                ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

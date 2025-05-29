@@ -105,7 +105,7 @@ class RequestsPolicy
     {
         return $user->can('reorder_requests');
     }
-
+    
     public function detail(User $user): bool
     {
         return $user->hasRole('Super Admin') || $user->hasRole('Ketua Divisi');

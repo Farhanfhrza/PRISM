@@ -17,19 +17,22 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'username' => 'required',
+            'email' => 'required|email',
             'password' => 'required'
         ]);
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            $username = $credentials['username']; 
-            $activity = Activity_log::create([
-                'user_id' => Auth::id(),
+            $email = $credentials['email']; 
+            $user = Auth::user();
+
+            // Catat aktivitas login
+            Activity_log::create([
+                'user_id' => $user->id,
                 'activity_type' => 'login',
                 'activity_category' => 'authentication',
-                'description' => "User '$username' telah login",
+                'description' => "User '{$user->name}' dengan email '{$email}' telah login",
             ]);
 
             return redirect()->intended('/');
@@ -40,18 +43,19 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        $username = Auth::user()->username;
-        $activity = Activity_log::create([
-            'user_id' => Auth::id(),
+        $user = Auth::user();
+
+        // Catat aktivitas logout
+        Activity_log::create([
+            'user_id' => $user->id,
             'activity_type' => 'logout',
             'activity_category' => 'authentication',
-            'description' => "User '$username' telah logout",
+            'description' => "User '{$user->name}' dengan email '{$user->email}' telah logout",
         ]);
 
         Auth::logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');

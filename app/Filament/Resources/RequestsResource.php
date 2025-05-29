@@ -22,11 +22,12 @@ use Filament\Forms\Components\TextArea;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Exports\RequestsExporter;
+
+
 use Filament\Forms\Components\DateTimePicker;
-
-
 use App\Filament\Resources\RequestsResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\RequestsResource\RelationManagers;
@@ -179,21 +180,14 @@ class RequestsResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
-                Filter::make('Accepted')->query(
-                    function (Builder $query): Builder {
-                        return $query->where('status','accepted');
-                    }
-                ),
-                Filter::make('Pending')->query(
-                    function (Builder $query): Builder {
-                        return $query->where('status','pending');
-                    }
-                ),
-                Filter::make('Rejected')->query(
-                    function (Builder $query): Builder {
-                        return $query->where('status','rejected');
-                    }
-                ),
+                SelectFilter::make('status')
+                ->label('Status')
+                ->multiple()
+                ->options([
+                    'Accepted' => 'Accepted',
+                    'Pending' => 'Pending',
+                    'Rejected' => 'Rejected',
+                ]),
                 Filter::make('submit')
                     ->form([
                         DatePicker::make('from')->label('Dari Tanggal'),
@@ -220,7 +214,7 @@ class RequestsResource extends Resource
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
-                Action::make('detail')
+                Action::make('approval')
                     ->url(fn($record) => static::getUrl('detail', ['record' => $record]))
                     ->authorize('detail', Requests::class),
             ])

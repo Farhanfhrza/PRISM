@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('source_type');
             $table->unsignedBigInteger('source_id');
             $table->timestamp('created_at');
+            $table->foreignId('div_id')->constrained('divisions');
             
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('stationery_id')->references('id')->on('stationeries');

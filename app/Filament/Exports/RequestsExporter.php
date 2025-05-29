@@ -27,10 +27,10 @@ class RequestsExporter extends Exporter
                 ->formatStateUsing(function ($record) {
                     return $record->requestDetails->map(function ($detail) {
                         return "{$detail->stationery->name} (Qty: {$detail->amount})";
-                    })->implode('\n');
+                    })->implode(' ');
                 }),
-            ExportColumn::make('created_at')
-                ->label('Created At')
+            ExportColumn::make('submit')
+                ->label('Submitted at')
                 ->formatStateUsing(fn($state) => $state?->format('Y-m-d H:i:s')),
         ];
     }

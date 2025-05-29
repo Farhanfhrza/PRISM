@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('employee_id')->constrained('employees');
+            $table->unsignedBigInteger('initiated_by');
             $table->timestamp('submit')->useCurrent();
             $table->timestamp('approved')->nullable();
             $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending'); 
             $table->text('information')->nullable();
             $table->timestamps();
+
+            $table->foreign('initiated_by')->references('id')->on('users');
 
             // Add index for better performance  
             $table->index('employee_id');  

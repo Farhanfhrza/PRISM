@@ -21,24 +21,24 @@ class RequestObserver
      */
     public function updated(Requests $requests): void
     {
-        // Ambil request_detail lama (sebelum di-update)
-        DB::transaction(function () use ($requests) {
-            // Kembalikan stok lama
-            $oldDetails = Request_detail::where('request_id', $requests->id)->get();
-            foreach ($oldDetails as $detail) {
-                $stationery = Stationery::find($detail->stationery_id);
-                $stationery->stock += $detail->amount;
-                $stationery->save();
-            }
+        // // Ambil request_detail lama (sebelum di-update)
+        // DB::transaction(function () use ($requests) {
+        //     // Kembalikan stok lama
+        //     $oldDetails = Request_detail::where('request_id', $requests->id)->get();
+        //     foreach ($oldDetails as $detail) {
+        //         $stationery = Stationery::find($detail->stationery_id);
+        //         $stationery->stock += $detail->amount;
+        //         $stationery->save();
+        //     }
 
-            // Kurangi stok baru
-            $newDetails = Request_detail::where('request_id', $requests->id)->get();
-            foreach ($newDetails as $detail) {
-                $stationery = Stationery::find($detail->stationery_id);
-                $stationery->stock -= $detail->amount;
-                $stationery->save();
-            }
-        });
+        //     // Kurangi stok baru
+        //     $newDetails = Request_detail::where('request_id', $requests->id)->get();
+        //     foreach ($newDetails as $detail) {
+        //         $stationery = Stationery::find($detail->stationery_id);
+        //         $stationery->stock -= $detail->amount;
+        //         $stationery->save();
+        //     }
+        // });
     }
 
     /**
@@ -95,6 +95,7 @@ class RequestObserver
                 'user_id' => $user->id,
                 'stationery_id' => $stok->id,
                 'transaction_type' => 'In',
+                'div_id' => $user?->div_id,
                 'amount' => $stationery->amount,
                 'description' => "Pengguna {$user->name} menghapus data request, sehingga stok {$stok->name} bertambah sebanyak {$stationery->amount} {$stok->unit}",
                 'source_type' => 'Request',

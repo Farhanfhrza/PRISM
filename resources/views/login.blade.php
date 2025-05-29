@@ -18,8 +18,8 @@
         <form class="mt-10" action="{{ route('login.in') }}" method="POST">
             @csrf
             <label class="block">
-                <span class="text-lg ">Username</span>
-                <input type="name" name="username" autofocus required value="{{ old('email') }}"
+                <span class="text-lg ">Email</span>
+                <input type="email" name="email" autofocus required value="{{ old('email') }}"
                     class="block w-full px-4 py-2 mt-1 transition duration-200 ease-in-out border border-gray-300 rounded-lg shadow-sm form-control focus:border-lime-500 focus:ring-lime-500 focus:outline-none focus:shadow-outline">
                 <div class="invalid-feedback">
                 </div>

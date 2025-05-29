@@ -16,8 +16,10 @@ return new class extends Migration
             $table->unsignedBigInteger('initiated_by');
             $table->unsignedBigInteger('approved_by')->nullable();
             $table->date('opname_date');
-            $table->enum('opname_status', ['Draft', 'Completed', 'Cancelled', 'Approved']);
+            $table->enum('opname_status', ['Draft', 'Completed', 'Cancelled', 'Approved'])->default('Draft');
             $table->text('description')->nullable();
+            $table->foreignId('div_id')->constrained('divisions');
+
             $table->timestamps();
         
             $table->foreign('initiated_by')->references('id')->on('users');

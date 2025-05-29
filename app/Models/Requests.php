@@ -17,7 +17,8 @@ class Requests extends Model
         'submit',
         'approved',
         'status',
-        'information'
+        'information',
+        'initiated_by'
     ];
     protected $attributes = [
         'status' => 'pending',
@@ -38,6 +39,11 @@ class Requests extends Model
     public function requestDetails()
     {
         return $this->hasMany(Request_detail::class, 'request_id');
+    }
+
+    public function initiator()
+    {
+        return $this->belongsTo(User::class, 'initiated_by');
     }
 
     protected static function booted()

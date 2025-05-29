@@ -10,10 +10,12 @@ use Filament\Tables\Table;
 use App\Models\InsertStock;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
+use Filament\Tables\Filters\Filter;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DateTimePicker;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -65,7 +67,22 @@ class InsertStockResource extends Resource
                 ->label('Diinput Oleh'),
             ])
             ->filters([
-                //
+                Filter::make('inserted_at')
+                    ->form([
+                        DatePicker::make('from')->label('Dari Tanggal'),
+                        DatePicker::make('to')->label('Sampai Tanggal')
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date)
+                            )
+                            ->when(
+                                $data['to'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date)
+                            );
+                    })
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),

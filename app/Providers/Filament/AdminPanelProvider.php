@@ -19,6 +19,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\PermissionMiddleware;
+use Rupadana\ApiService\ApiServicePlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -70,6 +71,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
+            ])
+            ->plugins([
+                ApiServicePlugin::make()
             ]);
     }
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('stationery_id');
             $table->integer('amount');
             $table->unsignedBigInteger('inserted_by');
-            $table->date('inserted_at');
+            $table->timestamp('inserted_at');
             $table->timestamps();
         
             $table->foreign('stationery_id')->references('id')->on('stationeries');
