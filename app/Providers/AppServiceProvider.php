@@ -30,6 +30,6 @@ class AppServiceProvider extends ServiceProvider
         Stationery::observe(StationeryObserver::class);
         Requests::observe(RequestObserver::class); 
         Request_detail::observe(RequestDetailObserver::class); 
-        InsertStock::observe(InsertStockObserver::class); 
+        InsertStock::observe(InsertStockObserver::class);
     }
 }

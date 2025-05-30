@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Stationery extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
     protected $fillable = [
         'name',
         'category',
@@ -52,5 +54,14 @@ class Stationery extends Model
     public function getGlobalSearchResultUrl(): string
     {
         return \App\Filament\Resources\StationeryResource::getUrl('edit', ['record' => $this]);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'stock', 'unit']) // Field yang ingin dicatat
+            ->useLogName('stationery')           // Nama kategori log (opsional)
+            ->logOnlyDirty()                     // Hanya log jika data berubah
+            ->setDescriptionForEvent(fn(string $eventName) => "Stationery {$eventName}");
     }
 }

@@ -3,33 +3,24 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Auth\Events\Login;  
-use Illuminate\Auth\Events\Logout;  
 use App\Models\Activity_log;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use App\Listeners\LogLoginActivity;
+use App\Listeners\LogLogoutActivity;
 
 class EventServiceProvider extends ServiceProvider
 {
 
-    // protected $listen = [  
-    //     Login::class => [  
-    //         function ($event) {  
-    //             Activity_log::log(  
-    //                 'authentication',  
-    //                 'login',  
-    //                 'authentication',  
-    //             );  
-    //         },  
-    //     ],  
-    //     Logout::class => [  
-    //         function ($event) {  
-    //             Activity_log::log(  
-    //                 'authentication',  
-    //                 'logout',  
-    //                 'authentication'  
-    //             );  
-    //         },  
-    //     ],  
-    // ]; 
+    protected $listen = [
+        Login::class => [
+            LogLoginActivity::class,
+        ],
+        Logout::class => [
+            LogLogoutActivity::class,
+        ],
+    ];
+
     /**
      * Register services.
      */

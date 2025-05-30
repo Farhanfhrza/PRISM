@@ -9,6 +9,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\DB;
 
+
 class Requests extends Model
 {
     use HasFactory, SoftDeletes;

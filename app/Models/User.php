@@ -8,10 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles, HasApiTokens;
+    use HasFactory, Notifiable, HasRoles, HasApiTokens, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -77,5 +79,14 @@ class User extends Authenticatable
     public function getRoleName(): string
     {
         return $this->roles->first()?->name ?? 'No Role';
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'email', 'div_id']) // Field yang ingin dicatat
+            ->useLogName('user')           // Nama kategori log (opsional)
+            ->logOnlyDirty()                     // Hanya log jika data berubah
+            ->setDescriptionForEvent(fn(string $eventName) => "User {$eventName}");
     }
 }
