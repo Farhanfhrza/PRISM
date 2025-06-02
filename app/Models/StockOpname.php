@@ -8,6 +8,8 @@ use Spatie\Activitylog\LogOptions;
 
 class StockOpname extends Model
 {
+    use LogsActivity;
+
     protected $table = 'stock_opname';
 
     protected $fillable = [
@@ -32,5 +34,16 @@ class StockOpname extends Model
     public function division()
     {
         return $this->belongsTo(Division::class, 'div_id');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'initiated_by', 'approved_by', 'opname_date', 'opname_status', 'description', 'div_id'
+            ]) // Field yang ingin dicatat
+            ->useLogName('Stock Opname')           // Nama kategori log (opsional)
+            ->logOnlyDirty()                     // Hanya log jika data berubah
+            ->setDescriptionForEvent(fn(string $eventName) => "Stock Opname {$eventName}");
     }
 }

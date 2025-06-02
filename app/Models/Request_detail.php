@@ -10,7 +10,7 @@ use Spatie\Activitylog\LogOptions;
 
 class Request_detail extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
     protected $fillable = [
         'request_id',
         'stationery_id',
@@ -21,9 +21,22 @@ class Request_detail extends Model
     {
         return $this->belongsTo(Requests::class);
     }
-    
+
     public function stationery()
     {
         return $this->belongsTo(Stationery::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'request_id',
+                'stationery_id',
+                'amount'
+            ]) // Field yang ingin dicatat
+            ->useLogName('Request Detail')           // Nama kategori log (opsional)
+            ->logOnlyDirty()                     // Hanya log jika data berubah
+            ->setDescriptionForEvent(fn(string $eventName) => "Request Detail {$eventName}");
     }
 }

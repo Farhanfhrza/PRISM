@@ -28,4 +28,15 @@ class Division extends Model
     {
         return $this->hasMany(Stationery::class, 'div_id');
     }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'name',
+            ]) // Field yang ingin dicatat
+            ->useLogName('Division')           // Nama kategori log (opsional)
+            ->logOnlyDirty()                     // Hanya log jika data berubah
+            ->setDescriptionForEvent(fn(string $eventName) => "Division {$eventName}");
+    }
 }

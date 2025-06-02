@@ -6,14 +6,20 @@ use App\Models\Requests;
 use Illuminate\Support\Carbon;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Illuminate\Support\Facades\Auth;
 
 class StatsDashboard extends BaseWidget
 {
     protected function getStats(): array
     {
-        $pending = Requests::where('status', 'pending')->count();
+        $user = Auth::user();
+        $divId = $user->div_id;
+        $pending = Requests::where('status', 'pending')
+            ->whereHas('employee', fn($query) => $query->where('div_id', $divId))
+            ->count();
         $week = Requests::where('status', 'accepted')
-                ->whereBetween('created_at', [
+            ->whereHas('employee', fn($query) => $query->where('div_id', $divId))
+            ->whereBetween('created_at', [
                 Carbon::now()->subWeek(),
                 Carbon::now(),
             ])->count();

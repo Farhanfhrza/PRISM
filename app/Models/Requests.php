@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class Requests extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, LogsActivity;
     protected $fillable = [
         'employee_id',
         'submit',
@@ -63,4 +63,12 @@ class Requests extends Model
         });
     }
 
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['employee_id', 'approve', 'status', 'information']) // Field yang ingin dicatat
+            ->useLogName('request')           // Nama kategori log (opsional)
+            ->logOnlyDirty()                     // Hanya log jika data berubah
+            ->setDescriptionForEvent(fn(string $eventName) => "Request {$eventName}");
+    }
 }
