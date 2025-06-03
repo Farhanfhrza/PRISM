@@ -50,12 +50,12 @@ class StationeryResource extends Resource
                 TextInput::make('unit')
                     ->required()
                     ->disabledOn('edit'),
-                Select::make('div_id')
-                    ->label('Divisi')
-                    ->options(Division::all()->pluck('name', 'id')) // Ambil data divisi
-                    ->required()
-                    ->searchable()
-                    ->disabledOn('edit'),
+                // Select::make('div_id')
+                //     ->label('Divisi')
+                //     ->options(Division::all()->pluck('name', 'id')) // Ambil data divisi
+                //     ->required()
+                //     ->searchable()
+                //     ->disabledOn('edit'),
                 Textarea::make('description')->required(),
             ]);
     }

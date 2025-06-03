@@ -2,22 +2,23 @@
 
 namespace App\Filament\Resources\StockOpnameResource\Pages;
 
-use App\Filament\Resources\StockOpnameResource;
-use Filament\Resources\Pages\Page;
-use App\Models\OpnameDetail;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Actions\Action;
-use Filament\Facades\Filament;
 use App\Models\Stationery;
+use App\Models\Transaction;
+use App\Models\OpnameDetail;
+use Filament\Actions\Action;
+use App\Data\OpnameDetailData;
+use Filament\Facades\Filament;
+use Filament\Resources\Pages\Page;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Response;
+use Filament\Forms\Components\FileUpload;
+use Illuminate\Database\Eloquent\Builder;
+use Spatie\SimpleExcel\SimpleExcelReader;
 use Spatie\SimpleExcel\SimpleExcelWriter;
 use Filament\Actions\Imports\ImportAction;
-use App\Data\OpnameDetailData;
-use Filament\Forms\Components\FileUpload;
-use Spatie\SimpleExcel\SimpleExcelReader;
-use Filament\Notifications\Notification;
+use App\Filament\Resources\StockOpnameResource;
 
 class ViewOpnameDetails extends Page implements Tables\Contracts\HasTable
 {
@@ -52,36 +53,59 @@ class ViewOpnameDetails extends Page implements Tables\Contracts\HasTable
 
     public function getHeaderActions(): array
     {
-        return [
-            Action::make('export-template')
+        $user = Filament::auth()->user();
+        $opname = $this->record;
+        $actions = [];
+
+        // Tombol Approve (hanya untuk Ketua Divisi dan status Draft)
+        if ($opname->opname_status === 'Draft' && ($user->hasRole('Ketua Divisi') || $user->hasRole('Super Admin'))) {
+            $actions[] = Action::make('approve')
+                ->label('Setujui Opname')
+                ->icon('heroicon-o-check')
+                ->color('primary')
+                ->requiresConfirmation()
+                ->action(function () use ($opname, $user) {
+                    $opname->update([
+                        'opname_status' => 'Approved',
+                        'approved_by' => $user->id,
+                    ]);
+                    // Filament::notify('success', 'Status Opname disetujui.');
+                });
+        }
+
+        // Tombol Export Template (hanya untuk Staff Gudang saat Draft)
+        if ($opname->opname_status === 'Draft' && ($user->hasRole('staff gudang') || $user->hasRole('Super Admin'))) {
+            $actions[] = Action::make('export-template')
                 ->label('Export Template Excel')
                 ->icon('heroicon-o-arrow-down-tray')
+                ->color('success')
                 ->action(fn() => $this->exportTemplate())
-                ->requiresConfirmation()
-                ->color('success'),
+                ->requiresConfirmation();
+        }
 
-            Action::make('import-excel')
+        // Tombol Import Excel (hanya untuk Staff Gudang saat Draft)
+        if ($opname->opname_status === 'Draft' && ($user->hasRole('staff gudang') || $user->hasRole('Super Admin'))) {
+            $actions[] = Action::make('import-excel')
                 ->label('Import Opname Detail')
                 ->icon('heroicon-o-arrow-up-tray')
                 ->form([
-                    FileUpload::make('file')
+                    \Filament\Forms\Components\FileUpload::make('file')
                         ->label('File Excel')
-                        ->disk('local') // default Laravel storage/app
+                        ->disk('local')
                         ->directory('imports')
-                        ->required()
-                    // ->acceptedFileTypes(['.csv', '.xlsx'])
-                    ,
+                        ->required(),
                 ])
-                ->action(function (array $data): void {
+                ->action(function (array $data) use ($opname) {
                     $filePath = storage_path('app/' . $data['file']);
 
-                    $rows = SimpleExcelReader::create($filePath)->getRows();
+                    // Hapus data lama
+                    OpnameDetail::where('opname_id', $opname->id)->delete();
 
-                    OpnameDetail::where('opname_id', $this->record->id)->delete();
+                    $rows = \Spatie\SimpleExcel\SimpleExcelReader::create($filePath)->getRows();
 
                     foreach ($rows as $row) {
                         OpnameDetail::create([
-                            'opname_id' => $this->record->id,
+                            'opname_id' => $opname->id,
                             'stationery_id' => $row['stationery_id'],
                             'system_stock' => $row['system_stock'],
                             'actual_stock' => $row['actual_stock'],
@@ -90,13 +114,52 @@ class ViewOpnameDetails extends Page implements Tables\Contracts\HasTable
                         ]);
                     }
 
-                    Notification::make()
-                        ->title('Import Berhasil')
-                        ->body('Data berhasil diimpor dan data lama telah dihapus.')
-                        ->success()
-                        ->send();;
-                }),
-        ];
+                    // Filament::notify('success', 'Data berhasil diimpor.');
+                });
+        }
+
+        // Tombol Apply Stock (hanya jika status Approved dan role Staff Gudang / Ketua Divisi)
+        if (
+            $opname->opname_status === 'Approved' &&
+            ($user->hasRole('staff gudang') || $user->hasRole('Ketua Divisi') || $user->hasRole('Super Admin'))
+        ) {
+            $actions[] = Action::make('apply-actual-stock')
+                ->label('Terapkan Actual Stock')
+                ->icon('heroicon-o-check-circle')
+                ->color('warning')
+                ->requiresConfirmation()
+                ->modalHeading('Terapkan Actual Stock')
+                ->modalSubheading('Ini akan mengubah stok sesuai actual stock dan menyelesaikan opname.')
+                ->action(function () use ($opname, $user) {
+                    $details = OpnameDetail::where('opname_id', $opname->id)->get();
+
+                    foreach ($details as $detail) {
+                        $stationery = Stationery::find($detail->stationery_id);
+                        if ($stationery) {
+                            $oldStock = $stationery->stock;
+                            $stationery->stock = $detail->actual_stock;
+                            $stationery->save();
+
+                            Transaction::create([
+                                'user_id' => $user->id,
+                                'stationery_id' => $stationery->id,
+                                'transaction_type' => $detail->actual_stock > $oldStock ? 'In' : 'Out',
+                                'div_id' => $user->div_id,
+                                'amount' => abs($detail->actual_stock - $oldStock),
+                                'description' => "Stock opname menyesuaikan stok {$stationery->name} dari {$oldStock} ke {$detail->actual_stock}",
+                                'source_type' => 'Stock Opname',
+                                'source_id' => $opname->id,
+                                'created_at' => now(),
+                            ]);
+                        }
+                    }
+
+                    $opname->update(['opname_status' => 'Completed']);
+                    // Filament::notify('success', 'Stok berhasil diterapkan, opname selesai.');
+                });
+        }
+
+        return $actions;
     }
 
     protected function exportTemplate()

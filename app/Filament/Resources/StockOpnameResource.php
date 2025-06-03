@@ -72,7 +72,8 @@ class StockOpnameResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn(StockOpname $record) => $record->opname_status !== 'Completed'),
                 Action::make('Detail')
                     ->url(fn($record) => route('filament.admin.resources.stock-opnames.viewDetails', ['record' => $record]))
                     ->label('Detail')
