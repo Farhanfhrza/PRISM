@@ -105,9 +105,9 @@ class RequestsPolicy
     {
         return $user->can('reorder_requests');
     }
-    
-    public function detail(User $user): bool
+
+    public function detail(User $user, Requests $request)
     {
-        return $user->hasRole('Super Admin') || $user->hasRole('Ketua Divisi');
+        return $user->hasRole('Ketua Divisi'); // contoh
     }
 }

@@ -1,10 +1,11 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\GeminiController;
+use App\Http\Controllers\RequestController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\StationeryController;
-use App\Http\Controllers\RequestController;
-use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['auth']], function () {  
     Route::get('/', function () {  
@@ -32,3 +33,4 @@ Route::post('/login', [LoginController::class, 'login']) ->name('login.in');
 Route::post('/logout', [LoginController::class, 'logout']) ->name('logout');
 Route::get('/register', [RegisterController::class, 'index']) ->name('register')->middleware('guest');
 Route::post('/register', [RegisterController::class, 'store']) ->name('register.store');
+Route::post('/generate-text', [GeminiController::class, 'generateText']);

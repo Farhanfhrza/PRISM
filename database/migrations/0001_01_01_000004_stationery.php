@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('initial_stock')->default(0);
             $table->text('description');
             $table->foreignId('div_id')->constrained('divisions');
+            $table->string('barcode')->unique()->nullable()->after('description');
             $table->timestamps();
 
             $table->unique(['name', 'div_id']);

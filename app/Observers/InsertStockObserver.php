@@ -4,8 +4,10 @@ namespace App\Observers;
 
 use App\Models\Stationery;
 use App\Models\InsertStock;
+use App\Models\StockOpname;
 use App\Models\Transaction;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 
 class InsertStockObserver
 {
@@ -17,7 +19,7 @@ class InsertStockObserver
         Stationery::where('id', $insertStock->stationery_id)
             ->increment('stock', $insertStock->amount);
 
-        $user = Filament::auth()->user();
+        $user = $insertStock->user;
         $stationery = Stationery::find($insertStock->stationery_id);
 
         Transaction::create([
@@ -41,6 +43,30 @@ class InsertStockObserver
         //
     }
 
+    public function deleting(InsertStock $insertStock): void
+    {
+        $stationery = $insertStock->stationery; // pastikan ada relasi stationery()
+
+        if ($stationery) {
+            $divId = $stationery->div_id;
+
+            $opnameBerjalan = StockOpname::where('div_id', $divId)
+                ->whereNotIn('opname_status', ['Completed', 'Cancelled'])
+                ->exists();
+
+            if ($opnameBerjalan) {
+                // Cegah penghapusan
+                Notification::make()
+                    ->title('Stock Opname Berlangsung')
+                    ->body('Tidak bisa menghapus permintaan ATK karena sedang berlangsung stock opname di divisi ini.')
+                    ->danger()
+                    ->send();
+
+                abort(403, 'Stock opname masih berjalan di divisi ini');
+            }
+        }
+    }
+
     /**
      * Handle the InsertStock "deleted" event.
      */
@@ -49,7 +75,7 @@ class InsertStockObserver
         Stationery::where('id', $insertStock->stationery_id)
             ->decrement('stock', $insertStock->amount);
 
-        $user = Filament::auth()->user();
+        $user = $insertStock->user;
         $stationery = Stationery::find($insertStock->stationery_id);
 
         Transaction::create([

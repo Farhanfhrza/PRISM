@@ -71,6 +71,11 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class, 'user_id');
     }
 
+    public function requests()
+    {
+        return $this->hasMany(Requests::class, 'user_id');
+    }
+
     public function getFilamentName(): string
     {
         return $this->name;  // Or return the field you want to use as username

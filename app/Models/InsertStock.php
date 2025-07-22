@@ -29,6 +29,11 @@ class InsertStock extends Model
         return $this->belongsTo(User::class, 'inserted_by');
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'inserted_by');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

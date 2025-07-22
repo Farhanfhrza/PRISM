@@ -17,17 +17,23 @@ class Stationery extends Model
         'initial_stock',
         'unit',
         'description',
-        'div_id'
+        'div_id',
+        'barcode',
     ];
 
     public function division()
     {
-        return $this->belongsTo(Division::class);
+        return $this->belongsTo(Division::class, 'div_id');
     }
 
     public function requestDetails()
     {
         return $this->hasMany(Request_detail::class, 'stationery_id');
+    }
+
+    public function forecast()
+    {
+        return $this->hasOne(DemandForecast::class, 'stationery_name', 'name');
     }
 
     // Dalam model Product (atau model terkait)

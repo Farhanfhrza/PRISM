@@ -7,6 +7,7 @@ use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Models\Transaction;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -21,7 +22,7 @@ class TransactionResource extends Resource
 
     protected static ?string $navigationGroup = 'Stock';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 7;
 
     protected static ?string $navigationIcon = 'heroicon-o-arrows-up-down';
 
@@ -36,6 +37,14 @@ class TransactionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(function () {
+                $user = Filament::auth()->user();
+
+                return Transaction::query()
+                    ->whereHas('user', function ($query) use ($user) {
+                        $query->where('div_id', $user->div_id);
+                    });
+            })
             ->columns([
                 TextColumn::make('id')->label('ID')->sortable(),
                 TextColumn::make('user.name')
@@ -65,11 +74,11 @@ class TransactionResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('transaction_type')
-                ->label('Jenis Transaksi')
-                ->options([
-                    'In' => 'In',
-                    'Out' => 'Out',
-                ]),
+                    ->label('Jenis Transaksi')
+                    ->options([
+                        'In' => 'In',
+                        'Out' => 'Out',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

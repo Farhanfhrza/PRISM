@@ -34,11 +34,13 @@ class EmployeeResource extends Resource
             ->schema([
                 TextInput::make('name')->required(),
                 TextInput::make('department')->required(),
-                // Select::make('div_id')
-                //     ->label('Divisi')
-                //     ->options(Division::all()->pluck('name', 'id')) // Ambil data divisi
-                //     ->required()
-                //     ->searchable(),
+                Select::make('div_id')
+                    ->label('Divisi')
+                    ->options(Division::all()->pluck('name', 'id')) // Ambil data divisi
+                    ->required()
+                    ->searchable()
+                    ->visible(fn() => Auth::user()->hasRole(['admin', 'Super Admin']))
+                    ->default(fn() => Auth::user()->hasRole(['Staff Gudang', 'Ketua Divisi']) ? Auth::id() : null),
             ]);
     }
 

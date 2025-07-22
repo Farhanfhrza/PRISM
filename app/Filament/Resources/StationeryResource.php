@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use App\Models\Stationery;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\View;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextArea;
@@ -50,12 +51,25 @@ class StationeryResource extends Resource
                 TextInput::make('unit')
                     ->required()
                     ->disabledOn('edit'),
-                // Select::make('div_id')
-                //     ->label('Divisi')
-                //     ->options(Division::all()->pluck('name', 'id')) // Ambil data divisi
-                //     ->required()
-                //     ->searchable()
-                //     ->disabledOn('edit'),
+                Select::make('div_id')
+                    ->label('Divisi')
+                    ->options(Division::all()->pluck('name', 'id')) // Ambil data divisi
+                    ->required()
+                    ->searchable()
+                    ->visible(fn() => Auth::user()->hasRole(['admin', 'Super Admin']))
+                    ->default(fn() => Auth::user()->hasRole(['Staff Gudang', 'Ketua Divisi']) ? Auth::id() : null)
+                    ->disabledOn('edit'),
+                TextInput::make('barcode')
+                    ->label('Barcode')
+                    ->helperText('Scan barcode atau ketik manual')
+                    ->required()
+                    ->unique(ignoreRecord: true)
+                    ->extraInputAttributes([
+                        // 'x-ref' => 'barcodeInput',
+                        'id' => 'barcode-input',
+                    ])
+                    ->columnSpanFull(),
+                View::make('filament.stationery.barcode-scanner'),
                 Textarea::make('description')->required(),
             ]);
     }
@@ -73,13 +87,13 @@ class StationeryResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id')
-                ->label('ID'),
+                    ->label('ID'),
                 TextColumn::make('name')
-                ->searchable()
-                ->label('Nama'),
+                    ->searchable()
+                    ->label('Nama'),
                 TextColumn::make('category')
-                ->searchable()
-                ->label('Kategori'),
+                    ->searchable()
+                    ->label('Kategori'),
                 TextColumn::make('stock')->numeric()->label('Stok'),
                 TextColumn::make('unit')->numeric()->label('Satuan'),
             ])
@@ -88,13 +102,13 @@ class StationeryResource extends Resource
             )
             ->filters([
                 SelectFilter::make('category')
-                ->label('Kategori')
-                ->multiple()
-                ->options([
-                    'Stationery' => 'Stationery',
-                    'Electronic' => 'Electronic',
-                    'Utility' => 'Utility',
-                ]),
+                    ->label('Kategori')
+                    ->multiple()
+                    ->options([
+                        'Stationery' => 'Stationery',
+                        'Electronic' => 'Electronic',
+                        'Utility' => 'Utility',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

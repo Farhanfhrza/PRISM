@@ -2,19 +2,21 @@
 
 namespace App\Filament\Resources\RequestsResource\Pages;
 
-use Filament\Actions\Action;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Hidden;
+use App\Models\Employee;
 use Filament\Forms\Form;
+use App\Models\Stationery;
+use App\Models\Transaction;
+use Filament\Actions\Action;
+use App\Models\Request_detail;
+use Filament\Facades\Filament;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 use App\Filament\Resources\RequestsResource;
-use App\Models\Employee;
-use App\Models\Stationery;
-use App\Models\Request_detail;
 use Filament\Forms\Components\DateTimePicker;
 
 class RequestDetail extends ViewRecord
@@ -115,6 +117,26 @@ class RequestDetail extends ViewRecord
                     $record->status = 'rejected';
                     $record->approved = now();
                     $record->save();
+
+                    $user = Filament::auth()->user();
+                    $stationeries = Request_detail::where('request_id', $this->record->id)->get();
+                    foreach ($stationeries as $stationery) {
+                        $stok = Stationery::find($stationery->stationery_id);
+                        $stok->stock -= $stationery->amount;
+                        $stok->save();
+
+                        Transaction::create([
+                            'user_id' => $user?->id,
+                            'stationery_id' => $stok->id,
+                            'transaction_type' => 'In',
+                            'div_id' => $user?->div_id,
+                            'amount' => $stationery->amount,
+                            'description' => "Pengguna {$user->name} membatalkan request {$stok->name} sebanyak {$stationery->amount} {$stok->unit}",
+                            'source_type' => 'Request',
+                            'source_id' => $this->record->id,
+                            'created_at' => now(),
+                        ]);
+                    }
 
                     // Notifikasi berhasil
                     Notification::make()

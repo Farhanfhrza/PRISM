@@ -35,7 +35,14 @@ class UserController extends Controller
             return $this->sendResponse([
                 'access_token' => $tokenResult,
                 'token_type' => 'Bearer',
-                'user' => $user
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'div_id' => $user->div_id,
+                    'divisi_name' => $user->division->name,
+                    'role' => $user->getRoleNames()->first(), // Tambahkan ini
+                ]
             ], 'Authenticated');
         } catch (Exception $error) {
             return $this->sendError(
@@ -110,9 +117,11 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
-        $user = User::find(Auth::user()->id);
+        $request->user()->currentAccessToken()->delete();
 
-        $user->tokens()->delete();
-        return response()->noContent();
+        return response()->json([
+            'success' => true,
+            'message' => 'Logout berhasil'
+        ]);
     }
 }

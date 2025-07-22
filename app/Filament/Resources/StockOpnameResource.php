@@ -73,7 +73,7 @@ class StockOpnameResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->visible(fn(StockOpname $record) => $record->opname_status !== 'Completed'),
+                    ->visible(fn(StockOpname $record) => !in_array($record->opname_status, ['Completed', 'Cancelled'])),
                 Action::make('Detail')
                     ->url(fn($record) => route('filament.admin.resources.stock-opnames.viewDetails', ['record' => $record]))
                     ->label('Detail')
@@ -85,6 +85,18 @@ class StockOpnameResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function canCreate(): bool
+    {
+        $user = auth()->user();
+        $divId = $user->div_id;
+
+        $hasOpname = StockOpname::where('div_id', $divId)
+            ->whereNotIn('opname_status', ['Completed', 'Cancelled'])
+            ->exists();
+
+        return !$hasOpname;
     }
 
     public static function getRelations(): array

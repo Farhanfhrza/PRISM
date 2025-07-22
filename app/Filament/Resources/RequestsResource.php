@@ -11,6 +11,7 @@ use App\Models\Stationery;
 use Filament\Tables\Table;
 use App\Models\Request_detail;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use function Laravel\Prompts\select;
@@ -24,9 +25,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
+
+
 use App\Filament\Exports\RequestsExporter;
-
-
 use Filament\Forms\Components\DateTimePicker;
 use App\Filament\Resources\RequestsResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -70,6 +71,7 @@ class RequestsResource extends Resource
                                 $stationery = Stationery::find($state);
                                 if ($stationery) {
                                     $set('stock', $stationery->stock);
+                                    $set('unit', $stationery->unit);
                                 }
                             })
                             ->rules([
@@ -86,39 +88,45 @@ class RequestsResource extends Resource
                                     };
                                 }
                             ]),
-                        TextInput::make('amount')
-                            ->numeric()
-                            ->required()
-                            ->minValue(1)
-                            ->rules([
-                                'required',
-                                'numeric',
-                                'min:1',
-                                function ($get) {
-                                    return function (string $attribute, $value, $fail) use ($get) {
-                                        $stationeryId = $get('stationery_id');
-                                        $stationery = Stationery::find($stationeryId);
+                        Grid::make(2)->schema([
+                            TextInput::make('amount')
+                                ->numeric()
+                                ->required()
+                                ->minValue(1)
+                                ->rules([
+                                    'required',
+                                    'numeric',
+                                    'min:1',
+                                    function ($get) {
+                                        return function (string $attribute, $value, $fail) use ($get) {
+                                            $stationeryId = $get('stationery_id');
+                                            $stationery = Stationery::find($stationeryId);
 
-                                        if ($stationery) {
-                                            // Hitung stok tersedia (stok saat ini + stok yang sedang di-request)
-                                            $currentRequestId = $get('../../id');
-                                            $requestedAmount = 0;
+                                            if ($stationery) {
+                                                $currentRequestId = $get('../../id');
+                                                $requestedAmount = 0;
 
-                                            if ($currentRequestId) {
-                                                $requestedAmount = Request_detail::where('request_id', $currentRequestId)
-                                                    ->where('stationery_id', $stationeryId)
-                                                    ->sum('amount');
+                                                if ($currentRequestId) {
+                                                    $requestedAmount = Request_detail::where('request_id', $currentRequestId)
+                                                        ->where('stationery_id', $stationeryId)
+                                                        ->sum('amount');
+                                                }
+
+                                                $availableStock = $stationery->stock + $requestedAmount;
+
+                                                if ($value > $availableStock) {
+                                                    $fail("Jumlah melebihi stok tersedia (Stok: {$availableStock})");
+                                                }
                                             }
+                                        };
+                                    }
+                                ]),
 
-                                            $availableStock = $stationery->stock + $requestedAmount;
-
-                                            if ($value > $availableStock) {
-                                                $fail("Jumlah melebihi stok tersedia (Stok: {$availableStock})");
-                                            }
-                                        }
-                                    };
-                                }
-                            ]),
+                            TextInput::make('unit')
+                                ->label('Unit')
+                                ->disabled()
+                                ->dehydrated(false),
+                        ]),
                         TextInput::make('stock')->label('Stok Tersedia')->disabled(),
                     ]),
             ]);
@@ -139,6 +147,9 @@ class RequestsResource extends Resource
                 TextColumn::make('employee.name')
                     ->searchable()
                     ->label('Nama'),
+                TextColumn::make('employee.department')
+                    ->searchable()
+                    ->label('Departemen'),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
@@ -159,10 +170,10 @@ class RequestsResource extends Resource
                         };
                     }),
                 TextColumn::make('submit')
-                ->date()
-                ->sortable()
-                ->searchable()
-                ->toggleable(),
+                    ->date()
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
             ])
             ->headerActions([
                 Tables\Actions\ExportAction::make()
@@ -181,13 +192,13 @@ class RequestsResource extends Resource
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 SelectFilter::make('status')
-                ->label('Status')
-                ->multiple()
-                ->options([
-                    'Accepted' => 'Accepted',
-                    'Pending' => 'Pending',
-                    'Rejected' => 'Rejected',
-                ]),
+                    ->label('Status')
+                    ->multiple()
+                    ->options([
+                        'Accepted' => 'Accepted',
+                        'Pending' => 'Pending',
+                        'Rejected' => 'Rejected',
+                    ]),
                 Filter::make('submit')
                     ->form([
                         DatePicker::make('from')->label('Dari Tanggal'),
@@ -216,7 +227,8 @@ class RequestsResource extends Resource
                 Tables\Actions\RestoreAction::make(),
                 Action::make('approval')
                     ->url(fn($record) => static::getUrl('detail', ['record' => $record]))
-                    ->authorize('detail', Requests::class),
+                    ->authorize('detail', Requests::class)
+                    ->hidden(fn(Requests $record) => $record->status !== 'pending'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

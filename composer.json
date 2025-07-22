@@ -10,6 +10,7 @@
         "filament/actions": "^3.3",
         "filament/filament": "3.3",
         "filament/forms": "3.3",
+        "google-gemini-php/laravel": "^2.0",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",

@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use App\Models\Stationery;
 use Filament\Tables\Table;
 use App\Models\InsertStock;
+use App\Models\StockOpname;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Tables\Filters\Filter;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DateTimePicker;
@@ -28,7 +30,7 @@ class InsertStockResource extends Resource
 
     protected static ?string $navigationGroup = 'Stock';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 6;
 
     protected static ?string $navigationIcon = 'heroicon-o-archive-box-arrow-down';
 

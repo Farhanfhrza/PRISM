@@ -10,6 +10,8 @@ use Spatie\Activitylog\LogOptions;
 class Employee extends Model
 {
     use HasFactory, LogsActivity;
+
+    protected $table = 'employees';
     protected $fillable = [
         'name',
         'department',

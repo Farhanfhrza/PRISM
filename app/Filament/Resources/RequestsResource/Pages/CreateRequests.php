@@ -3,10 +3,13 @@
 namespace App\Filament\Resources\RequestsResource\Pages;
 
 use Filament\Actions;
+use App\Models\Employee;
 use App\Models\Stationery;
+use App\Models\StockOpname;
 use App\Models\Transaction;
 use App\Models\Request_detail;
 use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\RequestsResource;
 
@@ -17,6 +20,26 @@ class CreateRequests extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        $employee = Employee::find($data['employee_id']);
+
+        if ($employee) {
+            $divId = $employee->div_id;
+
+            $opnameBerjalan = StockOpname::where('div_id', $divId)
+                ->whereNotIn('opname_status', ['Completed', 'Cancelled'])
+                ->exists();
+
+            if ($opnameBerjalan) {
+                Notification::make()
+                    ->title('Stock Opname Berlangsung')
+                    ->body('Tidak bisa membuat permintaan ATK karena sedang berlangsung stock opname di divisi ini.')
+                    ->danger()
+                    ->send();
+
+                abort(403, 'Stock opname masih berjalan di divisi ini');
+            }
+        }
+
         $data['initiated_by'] = Filament::auth()->user()?->id;
         return $data;
     }

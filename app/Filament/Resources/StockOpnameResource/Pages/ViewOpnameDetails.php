@@ -69,12 +69,35 @@ class ViewOpnameDetails extends Page implements Tables\Contracts\HasTable
                         'opname_status' => 'Approved',
                         'approved_by' => $user->id,
                     ]);
+                    Notification::make()
+                        ->title('Opname Disetujui')
+                        ->success()
+                        ->send();
+                    // Filament::notify('success', 'Status Opname disetujui.');
+                });
+        }
+        
+        if ($opname->opname_status === 'Draft' && ($user->hasRole('Ketua Divisi') || $user->hasRole('Super Admin'))) {
+            $actions[] = Action::make('reject')
+                ->label('Tolak Opname')
+                ->icon('heroicon-o-x-circle')
+                ->color('warning')
+                ->requiresConfirmation()
+                ->action(function () use ($opname, $user) {
+                    $opname->update([
+                        'opname_status' => 'Cancelled',
+                        'approved_by' => $user->id,
+                    ]);
+                    Notification::make()
+                        ->title('Opname Ditolak')
+                        ->success()
+                        ->send();
                     // Filament::notify('success', 'Status Opname disetujui.');
                 });
         }
 
         // Tombol Export Template (hanya untuk Staff Gudang saat Draft)
-        if ($opname->opname_status === 'Draft' && ($user->hasRole('staff gudang') || $user->hasRole('Super Admin'))) {
+        if ($opname->opname_status === 'Draft' && ($user->hasRole('Staff Gudang') || $user->hasRole('Super Admin'))) {
             $actions[] = Action::make('export-template')
                 ->label('Export Template Excel')
                 ->icon('heroicon-o-arrow-down-tray')
@@ -84,7 +107,7 @@ class ViewOpnameDetails extends Page implements Tables\Contracts\HasTable
         }
 
         // Tombol Import Excel (hanya untuk Staff Gudang saat Draft)
-        if ($opname->opname_status === 'Draft' && ($user->hasRole('staff gudang') || $user->hasRole('Super Admin'))) {
+        if ($opname->opname_status === 'Draft' && ($user->hasRole('Staff Gudang') || $user->hasRole('Super Admin'))) {
             $actions[] = Action::make('import-excel')
                 ->label('Import Opname Detail')
                 ->icon('heroicon-o-arrow-up-tray')
@@ -121,7 +144,7 @@ class ViewOpnameDetails extends Page implements Tables\Contracts\HasTable
         // Tombol Apply Stock (hanya jika status Approved dan role Staff Gudang / Ketua Divisi)
         if (
             $opname->opname_status === 'Approved' &&
-            ($user->hasRole('staff gudang') || $user->hasRole('Ketua Divisi') || $user->hasRole('Super Admin'))
+            ($user->hasRole('Staff Gudang') || $user->hasRole('Ketua Divisi') || $user->hasRole('Super Admin'))
         ) {
             $actions[] = Action::make('apply-actual-stock')
                 ->label('Terapkan Actual Stock')

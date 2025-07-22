@@ -12,9 +12,9 @@ class CreateEmployee extends CreateRecord
 {
     protected static string $resource = EmployeeResource::class;
 
-    protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        $data['div_id'] = Filament::auth()->user()?->div_id;
-        return $data;
-    }
+    // protected function mutateFormDataBeforeCreate(array $data): array
+    // {
+    //     $data['div_id'] = Filament::auth()->user()?->div_id;
+    //     return $data;
+    // }
 }
